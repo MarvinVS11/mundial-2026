@@ -387,8 +387,8 @@ document.getElementById('next').onclick=()=>{stop();if(dayIdx<DAYS.length-1){day
 /* ---------- Supabase: carga y refresco automático ----------
    Poné tus credenciales y listo. Si quedan vacías, la app usa
    los datos incrustados en RESULTADOS (funciona offline igual). */
-const SUPABASE_URL = '';        // ej: 'https://xxxx.supabase.co'
-const SUPABASE_ANON_KEY = '';   // anon public key
+const SUPABASE_URL = 'https://jztvonoiitoyjgecunxj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dHZvbm9paXRveWpnZWN1bnhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTg2MDQsImV4cCI6MjA5NTY3NDYwNH0.eP1s7qqZEIGI7MWbJZ3sFiPdszLLMQzv8-ES5OD2F2A';
 
 async function cargarDesdeSupabase(){
   if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return false;
