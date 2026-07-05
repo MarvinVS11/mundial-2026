@@ -69,6 +69,44 @@
   @keyframes champGlow{0%,100%{box-shadow:0 0 0 3px rgba(0,0,0,.6),0 0 26px rgba(255,233,160,.95)}
     50%{box-shadow:0 0 0 3px rgba(0,0,0,.6),0 0 46px rgba(255,233,160,1),0 0 100px rgba(245,197,66,.7)}}
 
+  /* ---------- tabs ---------- */
+  #tabs{display:flex;gap:6px;justify-content:center;padding:4px 0 2px;flex:0 0 auto}
+  .tab{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;padding:7px 16px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line-idle);color:var(--txt-dim);background:transparent;
+    transition:all .25s}
+  .tab.on{border-color:var(--gold);color:var(--gold-soft);
+    background:rgba(245,197,66,.08);box-shadow:0 0 12px rgba(245,197,66,.25)}
+
+  /* ---------- vista de grupos ---------- */
+  #groupsview{flex:1 1 auto;min-height:0;overflow-y:auto;display:none;
+    padding:8px 12px calc(16px + env(safe-area-inset-bottom))}
+  #groupsgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));
+    gap:12px;max-width:1300px;margin:0 auto}
+  .gcard{border:1px solid var(--line-idle);border-radius:14px;overflow:hidden;
+    background:rgba(10,35,24,.5)}
+  .gcard h3{font-size:12px;font-weight:800;letter-spacing:.3em;color:var(--gold);
+    padding:9px 14px 7px;border-bottom:1px solid var(--line-idle);
+    background:rgba(245,197,66,.05)}
+  .gcard table{width:100%;border-collapse:collapse;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+  .gcard th{font-size:9px;color:var(--txt-dim);font-weight:400;letter-spacing:.1em;
+    padding:5px 4px;text-align:center}
+  .gcard th:nth-child(2){text-align:left}
+  .gcard td{padding:6px 4px;text-align:center;border-top:1px solid rgba(37,69,52,.5)}
+  .gcard td.tm{text-align:left;display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .gcard td.tm img{width:18px;height:18px;border-radius:50%;object-fit:cover;
+    border:1px solid #000;flex:0 0 auto}
+  .gcard td.pts{color:var(--gold);font-weight:500}
+  .gcard tr.q td{background:rgba(245,197,66,.055)}
+  .gcard tr.q td.tm{color:var(--gold-soft)}
+  .gcard tr.e td{opacity:.45}
+  .gcard tr.e td.tm img{filter:grayscale(1) brightness(.6)}
+  #glegend{max-width:1300px;margin:2px auto 10px;text-align:center;
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--txt-dim);
+    letter-spacing:.08em}
+  #glegend b{color:var(--gold-soft);font-weight:500}
+
   /* ---------- panel inferior ---------- */
   #panel{flex:0 0 auto;padding:6px 14px calc(12px + env(safe-area-inset-bottom));
     background:linear-gradient(180deg,transparent, rgba(2,10,6,.94) 30%)}
@@ -103,6 +141,16 @@
   <h1>MUNDIAL 2026</h1>
   <button id="zoombtn" title="Acercar / ver todo">⤢</button>
 </header>
+
+<div id="tabs">
+  <button class="tab on" data-v="llaves">Llaves</button>
+  <button class="tab" data-v="grupos">Grupos</button>
+</div>
+
+<div id="groupsview">
+  <div id="glegend"><b>■</b> clasificados a dieciseisavos (1.º, 2.º y los 8 mejores terceros)</div>
+  <div id="groupsgrid"></div>
+</div>
 
 <div id="viewport">
   <div id="wrap">
@@ -389,6 +437,64 @@ playbtn.onclick=()=>{
 };
 document.getElementById('prev').onclick=()=>{stop();if(dayIdx>0){dayIdx--;render();}};
 document.getElementById('next').onclick=()=>{stop();if(dayIdx<DAYS.length-1){dayIdx++;render();}};
+
+/* ============================ FASE DE GRUPOS ============================
+   [código, bandera, PG, PE, PP, Pts]  ·  q = clasificados a dieciseisavos */
+const XT = { KOR:['Corea del Sur','kr'], CZE:['Chequia','cz'], QAT:['Catar','qa'],
+  SCO:['Escocia','gb-sct'], HTI:['Haití','ht'], TUR:['Turquía','tr'],
+  CUW:['Curazao','cw'], TUN:['Túnez','tn'], IRN:['Irán','ir'],
+  NZL:['N. Zelanda','nz'], URU:['Uruguay','uy'], KSA:['A. Saudita','sa'],
+  IRQ:['Irak','iq'], JOR:['Jordania','jo'], UZB:['Uzbekistán','uz'], PAN:['Panamá','pa'] };
+const nombreDe = c => T[c] ? T[c].n : XT[c][0];
+const flagDe   = c => T[c] ? T[c].f : XT[c][1];
+
+const GRUPOS = {
+  A:[['MEX',3,0,0,9,1],['RSA',1,1,1,4,1],['KOR',1,0,2,3,0],['CZE',0,1,2,1,0]],
+  B:[['SUI',2,1,0,7,1],['CAN',1,1,1,4,1],['BIH',1,1,1,4,1],['QAT',0,1,2,1,0]],
+  C:[['BRA',2,1,0,7,1],['MAR',2,1,0,7,1],['SCO',1,0,2,3,0],['HTI',0,0,3,0,0]],
+  D:[['USA',2,0,1,6,1],['AUS',1,1,1,4,1],['PAR',1,1,1,4,1],['TUR',1,0,2,3,0]],
+  E:[['GER',2,0,1,6,1],['CIV',2,0,1,6,1],['ECU',1,1,1,4,1],['CUW',0,1,2,1,0]],
+  F:[['NED',2,1,0,7,1],['JPN',1,2,0,5,1],['SWE',1,1,1,4,1],['TUN',0,0,3,0,0]],
+  G:[['BEL',1,2,0,5,1],['EGY',1,2,0,5,1],['IRN',0,3,0,3,0],['NZL',0,1,2,1,0]],
+  H:[['ESP',2,1,0,7,1],['CPV',0,3,0,3,1],['URU',0,2,1,2,0],['KSA',0,2,1,2,0]],
+  I:[['FRA',3,0,0,9,1],['NOR',2,0,1,6,1],['SEN',1,0,2,3,1],['IRQ',0,0,3,0,0]],
+  J:[['ARG',3,0,0,9,1],['AUT',1,1,1,4,1],['ALG',1,1,1,4,1],['JOR',0,0,3,0,0]],
+  K:[['COL',2,1,0,7,1],['POR',1,2,0,5,1],['COD',1,1,1,4,1],['UZB',0,0,3,0,0]],
+  L:[['ENG',2,1,0,7,1],['CRO',2,0,1,6,1],['GHA',1,1,1,4,1],['PAN',0,0,3,0,0]],
+};
+
+(function renderGrupos(){
+  const grid=document.getElementById('groupsgrid');
+  Object.entries(GRUPOS).forEach(([g,filas])=>{
+    const card=document.createElement('div'); card.className='gcard';
+    let rows='';
+    filas.forEach(([c,pg,pe,pp,pts,q],k)=>{
+      rows+=`<tr class="${q?'q':'e'}">
+        <td>${k+1}</td>
+        <td class="tm"><img src="https://flagcdn.com/w40/${flagDe(c)}.png" alt=""
+          onerror="this.outerHTML='${flagEmoji(flagDe(c))}'">${nombreDe(c)}</td>
+        <td>3</td><td>${pg}</td><td>${pe}</td><td>${pp}</td>
+        <td class="pts">${pts}</td></tr>`;
+    });
+    card.innerHTML=`<h3>GRUPO ${g}</h3><table>
+      <tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Pts</th></tr>
+      ${rows}</table>`;
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+    const grupos = t.dataset.v==='grupos';
+    document.getElementById('groupsview').style.display=grupos?'block':'none';
+    viewport.style.display=grupos?'none':'block';
+    document.getElementById('panel').style.display=grupos?'none':'block';
+    if(!grupos) applyZoom();
+    if(grupos) stop();
+  };
+});
 
 /* ---------- Supabase: carga y refresco automático ----------
    Poné tus credenciales y listo. Si quedan vacías, la app usa
