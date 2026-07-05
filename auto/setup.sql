@@ -72,7 +72,7 @@ select cron.schedule(
   '*/20 * * * *',
   $$
   select net.http_post(
-    url     := 'https://TU-PROYECTO.supabase.co/functions/v1/sync-mundial',
+    url     := 'https://jztvonoiitoyjgecunxj.supabase.co/functions/v1/sync-mundial',
     headers := '{"Authorization": "Bearer TU_SERVICE_ROLE_KEY"}'::jsonb
   );
   $$
