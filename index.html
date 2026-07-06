@@ -60,8 +60,8 @@
   .node .flagimg{width:100%;height:100%;border-radius:50%;object-fit:cover;pointer-events:none}
   .mcard .mfimg{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid #000}
   .node .tag{position:absolute;left:50%;top:calc(100% + 2px);transform:translateX(-50%);
-    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;
-    color:var(--txt-dim);text-shadow:0 1px 2px #000;pointer-events:none}
+    font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;letter-spacing:.06em;
+    color:var(--txt);text-shadow:0 1px 2px #000;pointer-events:none}
   .node.alive{border-color:var(--gold);box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 14px rgba(245,197,66,.55)}
   .node.alive .tag{color:var(--gold-soft)}
   .node.out{filter:grayscale(1) brightness(.5);opacity:.4;border-color:var(--dead);z-index:2}
@@ -291,7 +291,7 @@ const ROUNDS=[
   {slots:4, name:'Semifinales'},
   {slots:2, name:'Gran Final'},
 ];
-const ROWH=52, COLW=96, CENTERW=170, PADX=34, PADY=30;
+const ROWH=64, COLW=112, CENTERW=190, PADX=44, PADY=40;
 const H = PADY*2 + 16*ROWH;
 const W = PADX*2 + COLW*4*2 + CENTERW;
 const CX=W/2, CY=H/2;
@@ -359,7 +359,7 @@ BRACKET.forEach((code,i)=>{
   board.appendChild(el);
   nodes[code]={el,base:i};
 });
-document.documentElement.style.setProperty('--nd','38px');
+document.documentElement.style.setProperty('--nd','48px');
 
 /* Cables rectos en escuadra: hijo → codo → padre */
 const wireEls={};
