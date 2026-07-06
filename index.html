@@ -243,6 +243,46 @@ const RESULTADOS = [
   {r:4,i:0, d:'2026-07-19'},
 ];
 
+/* ---- Fase de grupos (11–27 jun): [fecha, grupo, A, B, golesA, golesB] ---- */
+const FASE_GRUPOS = [
+ ['2026-06-11','A','MEX','RSA',2,0],['2026-06-12','A','KOR','CZE',2,1],
+ ['2026-06-12','B','CAN','BIH',1,1],['2026-06-13','D','USA','PAR',4,1],
+ ['2026-06-13','B','QAT','SUI',1,1],['2026-06-13','C','BRA','MAR',1,1],
+ ['2026-06-14','C','HTI','SCO',0,1],['2026-06-14','D','AUS','TUR',2,0],
+ ['2026-06-14','E','GER','CUW',7,1],['2026-06-14','F','NED','JPN',2,2],
+ ['2026-06-15','E','CIV','ECU',1,0],['2026-06-15','F','SWE','TUN',5,1],
+ ['2026-06-15','H','ESP','CPV',0,0],['2026-06-15','G','EGY','BEL',1,1],
+ ['2026-06-15','H','KSA','URU',1,1],['2026-06-16','G','IRN','NZL',2,2],
+ ['2026-06-16','I','FRA','SEN',3,1],['2026-06-16','I','IRQ','NOR',1,4],
+ ['2026-06-17','J','ARG','ALG',3,0],['2026-06-17','J','AUT','JOR',3,1],
+ ['2026-06-17','K','POR','COD',1,1],['2026-06-17','L','ENG','CRO',4,2],
+ ['2026-06-17','L','GHA','PAN',1,0],['2026-06-17','K','COL','UZB',3,1],
+ ['2026-06-18','A','CZE','RSA',1,1],['2026-06-18','B','SUI','BIH',4,1],
+ ['2026-06-18','B','CAN','QAT',6,0],['2026-06-18','A','MEX','KOR',1,0],
+ ['2026-06-19','D','USA','AUS',2,0],['2026-06-19','C','SCO','MAR',0,1],
+ ['2026-06-19','C','BRA','HTI',3,0],['2026-06-19','D','TUR','PAR',0,1],
+ ['2026-06-20','F','NED','SWE',5,1],['2026-06-20','E','GER','CIV',2,1],
+ ['2026-06-20','E','ECU','CUW',0,0],['2026-06-20','F','TUN','JPN',0,4],
+ ['2026-06-21','H','ESP','KSA',4,0],['2026-06-21','G','BEL','IRN',0,0],
+ ['2026-06-21','H','URU','CPV',2,2],['2026-06-21','G','NZL','EGY',1,3],
+ ['2026-06-22','J','ARG','AUT',2,0],['2026-06-22','I','FRA','IRQ',3,0],
+ ['2026-06-22','I','NOR','SEN',3,2],['2026-06-22','J','JOR','ALG',1,2],
+ ['2026-06-23','K','POR','UZB',5,0],['2026-06-23','L','ENG','GHA',0,0],
+ ['2026-06-23','L','CRO','PAN',1,0],['2026-06-23','K','COL','COD',1,0],
+ ['2026-06-24','B','BIH','QAT',3,1],['2026-06-24','B','SUI','CAN',2,1],
+ ['2026-06-24','C','MAR','HTI',4,2],['2026-06-24','C','SCO','BRA',0,3],
+ ['2026-06-25','A','RSA','KOR',1,0],['2026-06-25','A','CZE','MEX',0,3],
+ ['2026-06-25','E','CUW','CIV',0,2],['2026-06-25','E','ECU','GER',2,1],
+ ['2026-06-25','F','JPN','SWE',1,1],['2026-06-25','F','TUN','NED',1,3],
+ ['2026-06-25','D','TUR','USA',3,2],['2026-06-25','D','PAR','AUS',0,0],
+ ['2026-06-26','I','NOR','FRA',1,4],['2026-06-26','I','SEN','IRQ',5,0],
+ ['2026-06-26','H','CPV','KSA',0,0],['2026-06-26','H','URU','ESP',0,1],
+ ['2026-06-26','G','NZL','BEL',1,5],['2026-06-26','G','EGY','IRN',1,1],
+ ['2026-06-27','L','PAN','ENG',0,2],['2026-06-27','L','CRO','GHA',2,1],
+ ['2026-06-27','K','COL','POR',0,0],['2026-06-27','K','COD','UZB',3,1],
+ ['2026-06-27','J','ALG','AUT',3,3],['2026-06-27','J','JOR','ARG',1,3],
+].map(([d,g,a,b,sa,sb])=>({d,g,a,b,score:[sa,sb]}));
+
 /* ============================ GEOMETRÍA (llaves) ============================ */
 const ROUNDS=[
   {slots:32,name:'Dieciseisavos'},
@@ -292,7 +332,7 @@ function flagEmoji(code){
   return code.toUpperCase().replace(/./g,ch=>String.fromCodePoint(127397+ch.charCodeAt(0)));
 }
 
-const DAYS=[...new Set(RESULTADOS.map(m=>m.d))].sort();
+const DAYS=[...new Set([...FASE_GRUPOS.map(m=>m.d),...RESULTADOS.map(m=>m.d)])].sort();
 let dayIdx=0;
 let lastPlayed=(()=>{let k=0;RESULTADOS.forEach(m=>{if(m.score)k=Math.max(k,DAYS.indexOf(m.d));});return k;})();
 
@@ -382,24 +422,30 @@ function render(){
 
   const dt=new Date(today+'T12:00:00');
   const roundsToday=[...new Set(RESULTADOS.filter(m=>m.d===today).map(m=>ROUNDS[m.r].name))];
+  if(FASE_GRUPOS.some(m=>m.d===today)) roundsToday.unshift('Fase de grupos');
   document.querySelector('#daylabel .fecha').textContent=
     dt.toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'}).replace('.','');
   document.querySelector('#daylabel .ronda').textContent=roundsToday.join(' · ');
 
   const box=document.getElementById('matches'); box.innerHTML='';
-  RESULTADOS.filter(m=>m.d===today).forEach((m,k)=>{
-    const [a,b]=teamsOf(m);
+  const delDia=[...FASE_GRUPOS.filter(m=>m.d===today),...RESULTADOS.filter(m=>m.d===today)];
+  delDia.forEach((m,k)=>{
+    const [a,b]=m.g?[m.a,m.b]:teamsOf(m);
     const card=document.createElement('div');
     card.className='mcard'+(m.score?'':' pending');
     card.style.animationDelay=(k*90)+'ms';
-    const mimg=(c,lose)=>`<img class="mfimg ${lose?'loser':''}" src="https://flagcdn.com/w40/${T[c].f}.png" alt=""
-      onerror="this.outerHTML='<span class=mf>${flagEmoji(T[c].f)}</span>'">`;
-    const fa=a?mimg(a,m.score&&winnerOf(m)!==a):'·';
-    const fb=b?mimg(b,m.score&&winnerOf(m)!==b):'·';
-    const na=a?T[a].n:'Por definir', nb=b?T[b].n:'Por definir';
+    const mimg=(c,lose)=>`<img class="mfimg ${lose?'loser':''}" src="https://flagcdn.com/w40/${flagDe(c)}.png" alt=""
+      onerror="this.outerHTML='<span class=mf>${flagEmoji(flagDe(c))}</span>'">`;
+    const gw = m.g&&m.score ? (m.score[0]>m.score[1]?a : m.score[1]>m.score[0]?b : 'X') : null;
+    const perdioA = m.g ? (gw&&gw!=='X'&&gw!==a) : (m.score&&winnerOf(m)!==a);
+    const perdioB = m.g ? (gw&&gw!=='X'&&gw!==b) : (m.score&&winnerOf(m)!==b);
+    const fa=a?mimg(a,perdioA):'·';
+    const fb=b?mimg(b,perdioB):'·';
+    const na=a?nombreDe(a):'Por definir', nb=b?nombreDe(b):'Por definir';
     const mid=m.score?`<span class="sc">${m.score[0]}–${m.score[1]}</span>`:`<span class="sc">vs</span>`;
     const pn=m.pens?`<span class="pn">(${m.pens[0]}-${m.pens[1]} pen)</span>`:(m.aet?`<span class="pn">(t.e.)</span>`:'');
-    card.innerHTML=`${fa}<span>${na}</span>${mid}<span>${nb}</span>${fb}${pn}`;
+    const gtag=m.g?`<span class="pn">Gr. ${m.g}</span>`:'';
+    card.innerHTML=`${fa}<span>${na}</span>${mid}<span>${nb}</span>${fb}${pn}${gtag}`;
     box.appendChild(card);
   });
 
@@ -430,10 +476,11 @@ playbtn.onclick=()=>{
   if(dayIdx>=DAYS.length-1) dayIdx=0;
   render();
   playbtn.textContent='❚❚';
-  playing=setInterval(()=>{
-    if(dayIdx>=DAYS.length-1){stop();return;}
+  const paso=()=>{ if(dayIdx>=DAYS.length-1){stop();return;}
     dayIdx++;render();
-  },1600);
+    clearInterval(playing);
+    playing=setInterval(paso, DAYS[dayIdx]<'2026-06-28'?900:1600); };
+  playing=setInterval(paso, DAYS[dayIdx]<'2026-06-28'?900:1600);
 };
 document.getElementById('prev').onclick=()=>{stop();if(dayIdx>0){dayIdx--;render();}};
 document.getElementById('next').onclick=()=>{stop();if(dayIdx<DAYS.length-1){dayIdx++;render();}};
@@ -521,8 +568,12 @@ async function cargarDesdeSupabase(){
       m.score=score; m.pens=pens; m.aet=!!f.aet;
     });
     if(cambio){
+      const prevLast=lastPlayed;
       lastPlayed=0;
       RESULTADOS.forEach(m=>{if(m.score)lastPlayed=Math.max(lastPlayed,DAYS.indexOf(m.d));});
+      // si llegó un resultado nuevo y estábamos viendo el día más reciente,
+      // avanzar la línea de tiempo automáticamente al nuevo último día
+      if(dayIdx>=prevLast && lastPlayed>dayIdx && !playing) dayIdx=lastPlayed;
       render();
     }
     return true;
@@ -534,10 +585,11 @@ applyZoom(); render();
 cargarDesdeSupabase().finally(()=>{
   playbtn.textContent='❚❚';
   setTimeout(()=>{
-    playing=setInterval(()=>{
-      if(dayIdx>=lastPlayed){stop();return;}
+    const paso=()=>{ if(dayIdx>=lastPlayed){stop();return;}
       dayIdx++;render();
-    },1400);
+      clearInterval(playing);
+      playing=setInterval(paso, DAYS[dayIdx]<'2026-06-28'?800:1400); };
+    playing=setInterval(paso, 800);
   },500);
 });
 setInterval(cargarDesdeSupabase, 5*60*1000);
