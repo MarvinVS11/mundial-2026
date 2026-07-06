@@ -87,13 +87,22 @@ Deno.serve(async (_req) => {
     const pen = m.score?.penalties ?? {};
     const dur = m.score?.duration; // REGULAR | EXTRA_TIME | PENALTY_SHOOTOUT
 
+    // Si la fila ya tiene equipos, respetar SU orden y mapear el marcador.
+    // (antes se reescribía el orden y el marcador quedaba cruzado)
+    const invertir = fila.a === away && fila.b === home;
+    const A = fila.a ?? home, B = fila.b ?? away;
+    const sA = invertir ? ft.away : ft.home;
+    const sB = invertir ? ft.home : ft.away;
+    const pA = invertir ? pen.away : pen.home;
+    const pB = invertir ? pen.home : pen.away;
+
     const nuevo = {
-      a: home,
-      b: away,
-      score_a: ft.home,
-      score_b: ft.away,
-      pens_a: dur === "PENALTY_SHOOTOUT" ? pen.home : null,
-      pens_b: dur === "PENALTY_SHOOTOUT" ? pen.away : null,
+      a: A,
+      b: B,
+      score_a: sA,
+      score_b: sB,
+      pens_a: dur === "PENALTY_SHOOTOUT" ? pA : null,
+      pens_b: dur === "PENALTY_SHOOTOUT" ? pB : null,
       aet: dur === "EXTRA_TIME",
       updated_at: new Date().toISOString(),
     };
@@ -120,12 +129,16 @@ Deno.serve(async (_req) => {
   };
   for (const f of todo ?? []) {
     if (f.r === 0) continue;
+    if (f.score_a != null) continue; // partido ya jugado: no tocar
     const h1 = todo!.find((x) => x.r === f.r - 1 && x.i === f.i * 2);
     const h2 = todo!.find((x) => x.r === f.r - 1 && x.i === f.i * 2 + 1);
     const na = h1 ? win(h1) : null, nb = h2 ? win(h2) : null;
-    if ((na && f.a !== na) || (nb && f.b !== nb)) {
-      await supa.from("partidos")
-        .update({ a: na ?? f.a, b: nb ?? f.b }).eq("r", f.r).eq("i", f.i);
+    // solo llenar cupos vacíos; nunca reordenar una fila que ya tiene equipos
+    const upd: Record<string, string> = {};
+    if (na && f.a == null) upd.a = na;
+    if (nb && f.b == null) upd.b = nb;
+    if (Object.keys(upd).length) {
+      await supa.from("partidos").update(upd).eq("r", f.r).eq("i", f.i);
       cambios++;
     }
   }
