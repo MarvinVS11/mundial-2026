@@ -60,7 +60,7 @@
   .node .flagimg{width:100%;height:100%;border-radius:50%;object-fit:cover;pointer-events:none}
   .mcard .mfimg{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid #000}
   .node .tag{position:absolute;left:50%;top:calc(100% + 2px);transform:translateX(-50%);
-    font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;letter-spacing:.05em;
+    font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;letter-spacing:.05em;
     color:var(--txt);text-shadow:0 1px 2px #000;pointer-events:none}
   .node.alive{border-color:var(--gold);box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 14px rgba(245,197,66,.55)}
   .node.alive .tag{color:var(--gold-soft)}
@@ -291,7 +291,7 @@ const ROUNDS=[
   {slots:4, name:'Semifinales'},
   {slots:2, name:'Gran Final'},
 ];
-const ROWH=88, COLW=136, CENTERW=220, PADX=56, PADY=52;
+const ROWH=116, COLW=170, CENTERW=260, PADX=70, PADY=66;
 const H = PADY*2 + 16*ROWH;
 const W = PADX*2 + COLW*4*2 + CENTERW;
 const CX=W/2, CY=H/2;
@@ -341,7 +341,7 @@ board.style.width=W+'px'; board.style.height=H+'px';
 wires.setAttribute('viewBox',`0 0 ${W} ${H}`);
 wires.style.width=W+'px'; wires.style.height=H+'px';
 
-const TRH=210, TRW=Math.round(TRH*305/735); // trofeo real (recorte)
+const TRH=260, TRW=Math.round(TRH*305/735); // trofeo real (recorte)
 trophy.style.height=TRH+'px';
 trophy.style.left=(CX-TRW/2)+'px';
 trophy.style.top=(CY-TRH*0.56)+'px';
@@ -353,13 +353,13 @@ const nodes={};
 BRACKET.forEach((code,i)=>{
   const el=document.createElement('div');
   el.className='node';
-  el.innerHTML=`<img class="flagimg" src="https://flagcdn.com/w80/${T[code].f}.png" alt=""
+  el.innerHTML=`<img class="flagimg" src="https://flagcdn.com/w160/${T[code].f}.png" alt=""
       onerror="this.outerHTML='<span class=flag>${flagEmoji(T[code].f)}</span>'">`+
     `<span class="tag">${code}</span>`;
   board.appendChild(el);
   nodes[code]={el,base:i};
 });
-document.documentElement.style.setProperty('--nd','60px');
+document.documentElement.style.setProperty('--nd','80px');
 
 /* Cables rectos en escuadra: hijo → codo → padre */
 const wireEls={};
